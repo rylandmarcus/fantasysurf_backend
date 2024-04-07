@@ -11,6 +11,7 @@ const secret = process.env.SECRET
 const jwt = require('jsonwebtoken')
 const authController = require('./controllers/authController')
 const cookieParser = require('cookie-parser')
+const User = require('./models/user')
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -47,6 +48,11 @@ app.use((req, res, next)=>{
 app.get('/verify', (req, res)=>{
     console.log(req.user._id)
     res.json({Status: 'Success', message: 'authorized'})
+})
+
+app.get('/myhome', async (req, res)=>{
+    const user = await User.findById(req.user._id)
+    res.json(user)
 })
 
 app.get('/locked', (req, res)=>{
