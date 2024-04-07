@@ -29,6 +29,30 @@ app.get('/', (req, res)=>{
 
 app.use('/auth', authController)
 
+app.use((req, res, next)=>{
+    const token = req.cookies.token
+    if (!token){
+        res.status(401).json({Status: 'Error', message: 'unauthorized'})
+    } else {
+        try {
+            const decoded = jwt.verify(token, secret)
+            req.user = decoded
+            next()
+        } catch (error) {
+            res.status(401).json({Status: 'Error', message: 'unauthorized'})
+        }
+    }
+})
+
+app.get('/verify', (req, res)=>{
+    console.log(req.user._id)
+    res.json({Status: 'Success', message: 'authorized'})
+})
+
+app.get('/locked', (req, res)=>{
+    res.json('secret stuff')
+})
+
 server.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`)
 })

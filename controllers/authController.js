@@ -5,6 +5,7 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const saltRounds = parseInt(process.env.SALT_ROUNDS)
+const secret = process.env.SECRET
 
 router.get('/', (req, res)=>{
     res.send('Hello from auth route!')
@@ -15,7 +16,7 @@ router.post('/login', async (req, res)=>{
     if (userToLogin){
         bcrypt.compare(req.body.password, userToLogin.password, (err, result)=>{
             if (result){
-                const token = jwt.sign({username: req.body.username}, 'keyboard', {expiresIn: '1h'});
+                const token = jwt.sign({_id: userToLogin._id}, secret, {expiresIn: '1h'});
                 res.cookie('token', token, {httpOnly: true}).json({Status: 'Success'})
             } else if (err) {
                 res.status(400).json({Status: 'Error', message: 'incorrect username or password'})
@@ -42,7 +43,7 @@ router.post('/signup', async (req, res)=>{
 })
 
 router.get('/logout', (req, res)=>{
-
+    res.clearCookie('token').json({Status: 'Logged Out'})
 })
 
 module.exports = router
