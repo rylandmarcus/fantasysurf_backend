@@ -10,6 +10,7 @@ const PORT = process.env.PORT
 const secret = process.env.SECRET
 const jwt = require('jsonwebtoken')
 const authController = require('./controllers/authController')
+const adminController = require('./controllers/adminController')
 const cookieParser = require('cookie-parser')
 const User = require('./models/user')
 
@@ -18,18 +19,22 @@ const corsOptions = {
     credentials: true
 }
 
+//MIDDLEWARE
 app.use(cors(corsOptions))
 app.use(morgan('tiny'))
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 
+//ROUTES
 app.get('/', (req, res)=>{
     res.send('Hello World')
 })
 
+//AUTH ROUTES
 app.use('/auth', authController)
 
+//ROUTE PROTECTION
 app.use((req, res, next)=>{
     const token = req.cookies.token
     if (!token){
@@ -45,9 +50,18 @@ app.use((req, res, next)=>{
     }
 })
 
-app.get('/verify', (req, res)=>{
+//VERIFY ROUTE
+app.get('/verify', async (req, res)=>{
     console.log(req.user._id)
-    res.json({Status: 'Success', message: 'authorized'})
+    console.log(req.user.username)
+    const user = await User.findById(req.user._id)
+    if (user.username === 'admin'){
+        console.log('admin')
+        res.json({Status: 'Success', admin: true})
+    } else {
+        res.json({Status: 'Success'})
+    }
+    // res.json({Status: 'Success', message: 'authorized'})
 })
 
 app.get('/myhome', async (req, res)=>{
@@ -59,6 +73,20 @@ app.get('/locked', (req, res)=>{
     res.json('secret stuff')
 })
 
+//ADMIN VERIFICATION
+app.use(async (req, res, next)=>{
+    const user = await User.findById(req.user._id)
+    if (user.username === 'admin'){
+        next()
+    } else {
+        res.status(401).json({Status: 'Error', message: 'unauthorized'})
+    }
+})
+
+//ADMIN ROUTES
+app.use('/admin', adminController)
+
+//LISTENER
 server.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`)
 })
