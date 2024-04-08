@@ -16,8 +16,14 @@ router.post('/login', async (req, res)=>{
     if (userToLogin){
         bcrypt.compare(req.body.password, userToLogin.password, (err, result)=>{
             if (result){
-                const token = jwt.sign({_id: userToLogin._id}, secret, {expiresIn: '1h'});
-                res.cookie('token', token, {httpOnly: true}).json({Status: 'Success'})
+                if (userToLogin.username === 'admin'){
+                    const token = jwt.sign({_id: userToLogin._id}, secret, {expiresIn: '1h'});
+                    console.log('admin lgo in')
+                    res.cookie('token', token, {httpOnly: true}).json({Status: 'Success', admin: true})
+                } else {
+                    const token = jwt.sign({_id: userToLogin._id}, secret, {expiresIn: '1h'});
+                    res.cookie('token', token, {httpOnly: true}).json({Status: 'Success'})
+                }
             } else if (err) {
                 res.status(400).json({Status: 'Error', message: 'incorrect username or password'})
             } else {
