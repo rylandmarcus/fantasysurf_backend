@@ -15,6 +15,9 @@ router.get('/surfers', async (req, res)=>{
 
 router.get('/events', async (req, res)=>{
     const events = await Event.find({})
+    for (const event of events){
+        await event.populate('surfers')
+    }
     res.json(events)
 })
 
@@ -32,6 +35,10 @@ router.post('/events', async (req, res)=>{
 })
 
 //SHOW
-
+router.get('/events/:id', async (req, res)=>{
+    const event = await Event.findById(req.params.id)
+    await event.populate('surfers')
+    res.json(event)
+})
 
 module.exports = router
