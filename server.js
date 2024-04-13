@@ -11,6 +11,7 @@ const secret = process.env.SECRET
 const jwt = require('jsonwebtoken')
 const authController = require('./controllers/authController')
 const adminController = require('./controllers/adminController')
+const ctController = require('./controllers/ctStatsController')
 const cookieParser = require('cookie-parser')
 const User = require('./models/user')
 
@@ -53,7 +54,6 @@ app.use((req, res, next)=>{
 //VERIFY ROUTE
 app.get('/verify', async (req, res)=>{
     console.log(req.user._id)
-    console.log(req.user.username)
     const user = await User.findById(req.user._id)
     if (user.username === 'admin'){
         console.log('admin')
@@ -63,6 +63,9 @@ app.get('/verify', async (req, res)=>{
     }
     // res.json({Status: 'Success', message: 'authorized'})
 })
+
+//AUTHORIZED ROUTES
+app.use('/ct', ctController)
 
 app.get('/myhome', async (req, res)=>{
     const user = await User.findById(req.user._id)
