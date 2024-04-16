@@ -12,6 +12,11 @@ router.get('/events', async (req, res)=>{
     res.json(events)
 })
 
+router.get('/rankings', async (req, res)=>{
+    let surfers = await Surfer.find({rank:{ $ne: 0 }}).sort({rank:1})
+    res.json(surfers)
+})
+
 //SHOW
 
 module.exports = router
