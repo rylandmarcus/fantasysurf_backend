@@ -12,6 +12,7 @@ const jwt = require('jsonwebtoken')
 const authController = require('./controllers/authController')
 const adminController = require('./controllers/adminController')
 const ctController = require('./controllers/ctStatsController')
+const leagueController = require('./controllers/leagueController')
 const cookieParser = require('cookie-parser')
 const User = require('./models/user')
 
@@ -66,6 +67,7 @@ app.get('/verify', async (req, res)=>{
 
 //AUTHORIZED ROUTES
 app.use('/ct', ctController)
+app.use('/leagues', leagueController)
 
 app.get('/myhome', async (req, res)=>{
     const user = await User.findById(req.user._id)

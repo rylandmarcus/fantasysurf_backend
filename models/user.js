@@ -5,6 +5,12 @@ const userSchema = new mongoose.Schema(
         username: String,
         password: String,
         nickname: String,
+        teams: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Team'
+            }
+        ]
     },
     {timestamps: true}
 )
