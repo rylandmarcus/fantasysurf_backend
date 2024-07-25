@@ -10,8 +10,6 @@ const teamSchema = new mongoose.Schema(
             }
         ],
         points: {type: Number, default: 0},
-        usersName: String,
-        leagueName: String
     }, 
     {timestamps: true}
 )

@@ -15,6 +15,7 @@ const leagueSchema = new mongoose.Schema(
             ref: 'Event'
         },
         leagueType: String,
+        leagueSize: Number,
         leagueLength: String,
         completed: {type: Boolean, default: false},
         winner: {

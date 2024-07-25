@@ -15,6 +15,7 @@ const ctController = require('./controllers/ctStatsController')
 const leagueController = require('./controllers/leagueController')
 const cookieParser = require('cookie-parser')
 const User = require('./models/user')
+const Event = require('./models/event')
 
 const corsOptions = {
     origin: process.env.FRONTEND_URL,
@@ -32,6 +33,14 @@ app.use(cookieParser())
 app.get('/', (req, res)=>{
     res.send('Hello World')
 })
+
+// app.get('/bob', async (req, res)=>{
+//     let events  = await Event.find({})
+//     for (const event of events){
+//         await event.populate({path:'surfers', select:'name rank'})
+//     }
+//     res.send(events)
+// })
 
 //AUTH ROUTES
 app.use('/auth', authController)
