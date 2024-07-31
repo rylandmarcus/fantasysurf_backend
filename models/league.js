@@ -1,6 +1,7 @@
 const mongoose  = require('../database/connection')
 
 const leagueSchema = new mongoose.Schema(
+    //you may need to add like a locked property to the league to prevent people from joining after it starts
     {
         name: String,
         password: String,

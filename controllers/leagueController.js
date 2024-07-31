@@ -16,6 +16,42 @@ router.get('/myleagues', async (req, res)=>{
     res.json(leagues)
 })
 
+router.put('/joinleague/:id', async (req, res)=>{
+    const leagueFull = await League.findById(req.params.id)
+    await leagueFull.populate({path: 'teams', select: 'name'})
+    if (leagueFull.users.includes(req.user._id)){
+        res.json({Status: 'alreadyInLeague'})
+    } else if (leagueFull.users.length >= leagueFull.leagueSize){
+        res.json({Status: 'leagueFull'})
+    } else if (leagueFull.completed){
+        res.json({Status: 'leagueStarted'})
+        //this may need to be tinkered with
+    } else if (req.body.password === leagueFull.password){
+        let teamNameTaken = false
+        for (let i=0; i<leagueFull.teams.length; i++){
+            if (leagueFull.teams[i].name === req.body.teamName){
+                teamNameTaken = true
+                break
+            }
+        }
+        if (teamNameTaken){
+            res.json({Status: 'teamNameTaken'})
+        } else {  
+            const team = await Team.create({name: req.body.teamName})
+            const league = await League.findByIdAndUpdate(req.params.id, {$push: {teams: team._id, users: req.user._id}}, {new: true})
+            console.log(`user ${req.user._id} joined league ${req.params.id} as team ${team._id}`)
+            res.json(league)
+        }
+    } else if (req.body.password !== leagueFull.password){
+        res.json({Status: 'incorrectPassword'})
+    }
+})
+
+router.get('/joinleague', async (req, res)=>{
+    //find all leagues the user is not included in and the league is not complete
+    const leagues = await League.find({users: {$ne: req.user._id}, completed: false})
+    res.json(leagues)
+})
 
 router.post('/new', async (req, res)=>{
     const currentEvent = await Event.findOne({eventNumber: 5})
