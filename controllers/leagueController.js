@@ -12,8 +12,15 @@ router.get('/myleagues', async (req, res)=>{
             await league.populate('teams')
         // }
     }
-    console.log(leagues)
-    res.json(leagues)
+    let leaguesCopy = JSON.parse(JSON.stringify(leagues))
+    // let leaguesCopy = [...leagues]
+    leaguesCopy.map(league=>{
+        return league.currentUser = league.users.indexOf(req.user._id)
+    })
+    console.log(leaguesCopy)
+    // console.log(leagues)
+    // res.json(leagues)
+    res.json(leaguesCopy)
 })
 
 router.put('/joinleague/:id', async (req, res)=>{
