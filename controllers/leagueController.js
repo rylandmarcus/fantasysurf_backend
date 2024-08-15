@@ -79,7 +79,17 @@ router.post('/new', async (req, res)=>{
     res.json(newLeague)
 })
 
-
+router.get('/:id', async (req, res)=>{
+    const league = await League.findById(req.params.id)
+    await league.populate('teams')
+    leagueCopy = JSON.parse(JSON.stringify(league))
+    if (league.users.includes(req.user._id)){
+        leagueCopy.currentUser = league.users.indexOf(req.user._id)
+    } else {
+        leagueCopy.currentUser = -1
+    }
+    res.json(leagueCopy)
+})
 
 
 module.exports = router
