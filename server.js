@@ -33,6 +33,7 @@ app.use(cookieParser())
 app.get('/', (req, res)=>{
     res.send('Hello World')
 })
+//test
 
 // app.get('/bob', async (req, res)=>{
 //     let events  = await Event.find({})
