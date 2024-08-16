@@ -23,6 +23,41 @@ router.get('/myleagues', async (req, res)=>{
     res.json(leaguesCopy)
 })
 
+router.get('/joinleague', async (req, res)=>{
+    //find all leagues the user is not included in and the league is not complete
+    const leagues = await League.find({users: {$ne: req.user._id}, completed: false})
+    res.json(leagues)
+})
+
+router.post('/new', async (req, res)=>{
+    const currentEvent = await Event.findOne({eventNumber: 5})
+    //or ^ maybe if you have to load events on frontend for the choices, send over the ID
+    // const currentEvent = await Event.findOne({eventNumber: req.body.eventNumber})
+    let league = req.body
+    league.event = currentEvent._id
+    league.users = [req.user._id]
+    league.leagueLength = 'single'
+    league.leagueType = 'snake'
+    league.leagueSize = 4
+    const newTeam = await Team.create({name: req.body.teamName})
+    league.teams = [newTeam._id]
+    //^ this will only be relevant for certain types of leagues
+    console.log(league)
+    // ALSO CHECK for if league name is already taken
+    const newLeague = await League.create(league)
+    res.json(newLeague)
+})
+
+router.put('/leaveleague/:id', async (req, res)=>{
+    const league = await League.findById(req.params.id)
+    let teamId = league.teams[league.users.indexOf(req.user._id)]
+    league.users.pull(req.user._id)
+    league.teams.pull(teamId)
+    await league.save()
+    await Team.findByIdAndDelete(teamId)
+    res.json(league)
+})
+
 router.put('/joinleague/:id', async (req, res)=>{
     const leagueFull = await League.findById(req.params.id)
     await leagueFull.populate({path: 'teams', select: 'name'})
@@ -54,31 +89,6 @@ router.put('/joinleague/:id', async (req, res)=>{
     }
 })
 
-router.get('/joinleague', async (req, res)=>{
-    //find all leagues the user is not included in and the league is not complete
-    const leagues = await League.find({users: {$ne: req.user._id}, completed: false})
-    res.json(leagues)
-})
-
-router.post('/new', async (req, res)=>{
-    const currentEvent = await Event.findOne({eventNumber: 5})
-    //or ^ maybe if you have to load events on frontend for the choices, send over the ID
-    // const currentEvent = await Event.findOne({eventNumber: req.body.eventNumber})
-    let league = req.body
-    league.event = currentEvent._id
-    league.users = [req.user._id]
-    league.leagueLength = 'single'
-    league.leagueType = 'snake'
-    league.leagueSize = 4
-    const newTeam = await Team.create({name: req.body.teamName})
-    league.teams = [newTeam._id]
-    //^ this will only be relevant for certain types of leagues
-    console.log(league)
-    // ALSO CHECK for if league name is already taken
-    const newLeague = await League.create(league)
-    res.json(newLeague)
-})
-
 router.get('/:id', async (req, res)=>{
     const league = await League.findById(req.params.id)
     await league.populate('teams')
@@ -90,6 +100,7 @@ router.get('/:id', async (req, res)=>{
     }
     res.json(leagueCopy)
 })
+
 
 
 module.exports = router
