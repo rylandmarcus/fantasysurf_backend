@@ -106,10 +106,19 @@ router.get('/:id/team/:teamId', async (req, res)=>{
     let leagueCopy = JSON.parse(JSON.stringify(league))
     if (league.users.includes(req.user._id)){
         leagueCopy.currentUser = league.users.indexOf(req.user._id)
+        if (leagueCopy.teams[leagueCopy.currentUser] === req.params.teamId){
+            leagueCopy.myTeam = true
+        } else {
+            leagueCopy.myTeam = false
+        }
+    } else {
+        leagueCopy.currentUser = -1
+        leagueCopy.myTeam = false
     }
     const team = await Team.findById(req.params.teamId)
     await team.populate('surfers')
-    res.json(team)
+    console.log({league: leagueCopy, team})
+    res.json({league: leagueCopy, team})
 })
 
 module.exports = router
