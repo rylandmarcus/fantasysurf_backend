@@ -19,6 +19,7 @@ const leagueSchema = new mongoose.Schema(
         leagueSize: Number,
         leagueLength: String,
         completed: {type: Boolean, default: false},
+        status: String,
         winner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Team'

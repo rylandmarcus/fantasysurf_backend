@@ -39,6 +39,7 @@ router.post('/new', async (req, res)=>{
     league.leagueLength = 'single'
     league.leagueType = 'snake'
     league.leagueSize = 4
+    league.status = 'notFull'
     const newTeam = await Team.create({name: req.body.teamName})
     league.teams = [newTeam._id]
     //^ this will only be relevant for certain types of leagues
@@ -53,6 +54,9 @@ router.put('/leaveleague/:id', async (req, res)=>{
     let teamId = league.teams[league.users.indexOf(req.user._id)]
     league.users.pull(req.user._id)
     league.teams.pull(teamId)
+    if (league.users.length < league.leagueSize){
+        league.status = 'notFull'
+    }
     await league.save()
     await Team.findByIdAndDelete(teamId)
     res.json(league)
@@ -82,6 +86,10 @@ router.put('/joinleague/:id', async (req, res)=>{
             const team = await Team.create({name: req.body.teamName})
             const league = await League.findByIdAndUpdate(req.params.id, {$push: {teams: team._id, users: req.user._id}}, {new: true})
             console.log(`user ${req.user._id} joined league ${req.params.id} as team ${team._id}`)
+            if (league.users.length === league.leagueSize){
+                league.status = 'full'
+                await league.save()
+            }
             res.json(league)
         }
     } else if (req.body.password !== leagueFull.password){
