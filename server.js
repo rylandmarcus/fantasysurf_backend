@@ -87,6 +87,20 @@ app.get('/locked', (req, res)=>{
     res.json('secret stuff')
 })
 
+//SOCKETS
+const io = new Server(server, {
+    cors: {
+        origin: process.env.FRONTEND_URL,
+    }
+})
+
+io.on('connection', (socket)=>{
+    console.log('a user connected')
+    socket.on('disconnect', ()=>{
+        console.log('user disconnected')
+    })
+})
+
 //ADMIN VERIFICATION
 app.use(async (req, res, next)=>{
     const user = await User.findById(req.user._id)
