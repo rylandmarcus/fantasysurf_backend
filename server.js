@@ -96,13 +96,21 @@ const io = new Server(server, {
 
 io.on('connection', (socket)=>{
     console.log('a user connected')
-    socket.on('join draftroom', (data)=>{
+    socket.on('join draftroom', (leagueId)=>{
         console.log('joining draftroom')
-        socket.join(data.league)
+        socket.join(leagueId)
     })
-    socket.on('leave draftroom', (data)=>{
+    socket.on('leave draftroom', (leagueId)=>{
         console.log('leaving draftroom')
-        socket.leave(data.league)
+        socket.leave(leagueId)
+    })
+    socket.on('sayHi', (leagueId)=>{
+        console.log('hi')
+        io.to(leagueId).emit('receiveHi')
+    })
+    socket.on('hiOthers', (leagueId)=>{
+        console.log('hi others')
+        socket.to(leagueId).emit('receiveHiOthers')
     })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')

@@ -43,6 +43,7 @@ router.post('/new', async (req, res)=>{
     const newTeam = await Team.create({name: req.body.teamName})
     league.teams = [newTeam._id]
     //^ this will only be relevant for certain types of leagues
+    // you may need to make the first user to join the league manager or commisioner 
     console.log(league)
     // ALSO CHECK for if league name is already taken
     const newLeague = await League.create(league)
@@ -107,6 +108,21 @@ router.get('/:id', async (req, res)=>{
         leagueCopy.currentUser = -1
     }
     res.json(leagueCopy)
+})
+
+router.get('/:id/draft', async (req, res)=>{
+    const league = await League.findById(req.params.id)
+    if (league.users.includes(req.user._id)){
+        league.currentUser = league.users.indexOf(req.user._id)
+        await league.populate('teams')
+        for (const team of league.teams){
+            await team.populate('surfers')
+        }
+        //may not need to populate team surfers, just the surfers in the event and then pull
+        res.json(league)
+    } else {
+        res.json({Status: 'Not in League'})
+    }
 })
 
 router.get('/:id/team/:teamId', async (req, res)=>{
