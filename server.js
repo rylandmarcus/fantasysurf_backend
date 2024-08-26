@@ -96,6 +96,14 @@ const io = new Server(server, {
 
 io.on('connection', (socket)=>{
     console.log('a user connected')
+    socket.on('join draftroom', (data)=>{
+        console.log('joining draftroom')
+        socket.join(data.league)
+    })
+    socket.on('leave draftroom', (data)=>{
+        console.log('leaving draftroom')
+        socket.leave(data.league)
+    })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')
     })
