@@ -16,6 +16,8 @@ const leagueController = require('./controllers/leagueController')
 const cookieParser = require('cookie-parser')
 const User = require('./models/user')
 const Event = require('./models/event')
+const League = require('./models/league')
+const Team = require('./models/team')
 
 const corsOptions = {
     origin: process.env.FRONTEND_URL,
@@ -112,9 +114,18 @@ io.on('connection', (socket)=>{
         console.log('hi others')
         socket.to(leagueId).emit('receiveHiOthers')
     })
-    socket.on('draftSurfer', (surferId)=>{
+    socket.on('draftSurfer', (surferId, userIdIndx, leagueId)=>{
         console.log('drafting surfer')
-        io.to().emit('receiveDraft', surferId)
+        // async function draftSurfer(){
+        //     const league = await League.findById(leagueId)
+        //     await league.populate('event')
+        //     const surferIdx = league.event.surfers.indexOf(surferId)
+        //     // const team = await Team.findByIdAndUpdate(league.teams[userIdIndx], {$push: {surfers: surferIdx}}, {new: true})
+        //     console.log('drafted surfer '+surferIdx)
+        // }
+        // // io.to(leagueId).emit('thePickIsIn')
+        // draftSurfer()
+        io.to(leagueId).emit('receiveDraft', surferId, userIdIndx)
     })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')
