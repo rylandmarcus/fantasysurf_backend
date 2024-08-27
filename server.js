@@ -112,6 +112,10 @@ io.on('connection', (socket)=>{
         console.log('hi others')
         socket.to(leagueId).emit('receiveHiOthers')
     })
+    socket.on('draftSurfer', (surferId)=>{
+        console.log('drafting surfer')
+        io.to().emit('receiveDraft', surferId)
+    })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')
     })

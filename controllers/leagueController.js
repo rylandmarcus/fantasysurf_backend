@@ -113,13 +113,16 @@ router.get('/:id', async (req, res)=>{
 router.get('/:id/draft', async (req, res)=>{
     const league = await League.findById(req.params.id)
     if (league.users.includes(req.user._id)){
-        league.currentUser = league.users.indexOf(req.user._id)
         await league.populate('teams')
         for (const team of league.teams){
             await team.populate('surfers')
         }
+        await league.populate('event')
+        await league.event.populate('surfers')
         //may not need to populate team surfers, just the surfers in the event and then pull
-        res.json(league)
+        let leagueCopy = JSON.parse(JSON.stringify(league))
+        leagueCopy.currentUser = leagueCopy.users.indexOf(req.user._id)
+        res.json(leagueCopy)
     } else {
         res.json({Status: 'Not in League'})
     }
