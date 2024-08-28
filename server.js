@@ -116,16 +116,16 @@ io.on('connection', (socket)=>{
     })
     socket.on('draftSurfer', (surferId, userIdIndx, leagueId)=>{
         console.log('drafting surfer')
-        // async function draftSurfer(){
-        //     const league = await League.findById(leagueId)
-        //     await league.populate('event')
-        //     const surferIdx = league.event.surfers.indexOf(surferId)
-        //     // const team = await Team.findByIdAndUpdate(league.teams[userIdIndx], {$push: {surfers: surferIdx}}, {new: true})
-        //     console.log('drafted surfer '+surferIdx)
-        // }
-        // // io.to(leagueId).emit('thePickIsIn')
-        // draftSurfer()
+        async function draftSurfer(){
+            const league = await League.findById(leagueId)
+            await league.populate('event')
+            const surferIdx = league.event.surfers.indexOf(surferId)
+            const team = await Team.findByIdAndUpdate(league.teams[userIdIndx], {$push: {surfers: surferIdx}}, {new: true})
+            console.log('drafted surfer '+surferIdx)
+            console.log(team.surfers)
+        }
         io.to(leagueId).emit('receiveDraft', surferId, userIdIndx)
+        draftSurfer()
     })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')
