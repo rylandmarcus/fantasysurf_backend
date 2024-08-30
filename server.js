@@ -126,6 +126,11 @@ io.on('connection', (socket)=>{
         }
         io.to(leagueId).emit('receiveDraft', surferId, userIdIndx)
         draftSurfer()
+        //YOU ARE HERE... maybe try putting timer listener within this listener and see what happens?
+    })
+    socket.on('timer', (time, leagueId)=>{
+        console.log('timer: '+time)
+        io.to(leagueId).emit('receiveTimer', time)
     })
     socket.on('disconnect', ()=>{
         console.log('user disconnected')
