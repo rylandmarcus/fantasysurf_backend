@@ -101,7 +101,16 @@ router.put('/joinleague/:id', async (req, res)=>{
 router.get('/:id', async (req, res)=>{
     const league = await League.findById(req.params.id)
     await league.populate('teams')
+    const event = await Event.findById(league.event)
+    await event.populate('surfers')
     leagueCopy = JSON.parse(JSON.stringify(league))
+    leagueCopy.teams.map(team=>{
+        let surfers = []
+        team.surfers.map(surfer=>{
+            surfers.push(event.surfers[surfer])
+        })
+        team.surfers = surfers
+    })
     if (league.users.includes(req.user._id)){
         leagueCopy.currentUser = league.users.indexOf(req.user._id)
     } else {

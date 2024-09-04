@@ -109,6 +109,15 @@ io.on('connection', (socket)=>{
     socket.on('sayHi', (leagueId)=>{
         console.log('hi')
         io.to(leagueId).emit('receiveHi')
+        let time = 10
+        const timer = setInterval(()=>{
+            if (time > 0){
+                time--
+                io.to(leagueId).emit('receiveTimer', time)
+            } else {
+                clearInterval(timer)
+            }
+        }, 1000)
     })
     socket.on('hiOthers', (leagueId)=>{
         console.log('hi others')
@@ -126,7 +135,7 @@ io.on('connection', (socket)=>{
         }
         io.to(leagueId).emit('receiveDraft', surferId, userIdIndx)
         draftSurfer()
-        //YOU ARE HERE... maybe try putting timer listener within this listener and see what happens?
+        //YOU ARE HERE... maybe try putting timer listener within this listener and see what happens? try doing it in the hellos
     })
     socket.on('timer', (time, leagueId)=>{
         console.log('timer: '+time)
