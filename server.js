@@ -135,7 +135,7 @@ io.on('connection', (socket)=>{
         }
         io.to(leagueId).emit('receiveDraft', surferId, userIdIndx)
         draftSurfer()
-        //YOU ARE HERE... maybe try putting timer listener within this listener and see what happens? try doing it in the hellos
+        //YOU ARE HERE... time to deal with draft order, go to leagueController too
     })
     socket.on('timer', (time, leagueId)=>{
         console.log('timer: '+time)
